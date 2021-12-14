@@ -1,53 +1,56 @@
 {
-	"name": "tasuku",
-	"version": "1.0.0",
-	"description": "タスク — The minimal task runner",
-	"keywords": [
-		"simple",
-		"minimal",
-		"task",
-		"runner",
-		"cli"
-	],
-	"license": "MIT",
-	"repository": "privatenumber/tasuku",
-	"author": {
-		"name": "Okan Aslan",
-		"email": "okanaslan.08@gmail.com"
-	},
-	"main": "./dist/index.js",
-	"scripts": {
-		"test": "jest --runInBand --testTimeout 60000",
-		"build": "tsc -p ./tsconfig.json",
-		"lint": "eslint . --ext .ts"
-	},
-	"dependencies": {
-		"@types/node": "^16.11.12",
-		"@types/react": "^17.0.37",
-		"ink": "^3.2.0",
-		"ink-task-list": "^1.1.0",
-		"p-map": "^5.3.0",
-		"react": "^17.0.2",
-		"typescript": "^4.5.4",
-		"valtio": "^1.2.7",
-		"yoga-layout-prebuilt": "1.10.0"
-	},
-	"devDependencies": {
-		"@types/jest": "^27.0.3",
-		"es-jest": "^1.5.0",
-		"eslint": "^8.4.1",
-		"husky": "^7.0.4",
-		"jest": "^27.4.5",
-		"lint-staged": "^12.1.2",
-		"prettier": "^2.5.1"
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
-	"lint-staged": {
-		"*.ts": "npm run lint",
-		"*.{json,js,ts}": "npm run format"
-	}
+    "name": "tasuku",
+    "version": "1.0.0",
+    "description": "Task runner",
+    "keywords": [
+        "task runner"
+    ],
+    "license": "MIT",
+    "repository": "okanaslan/tasuku",
+    "author": {
+        "name": "Okan Aslan",
+        "email": "okanaslan.08@gmail.com"
+    },
+    "main": "src/index.ts",
+    "scripts": {
+        "test": "jest --runInBand --testTimeout 60000",
+        "build": "tsc -p ./tsconfig.json",
+        "lint": "eslint . --ext .ts"
+    },
+    "dependencies": {
+        "@types/node": "^16.11.12",
+        "@types/react": "^17.0.37",
+        "ink": "^3.2.0",
+        "ink-task-list": "^1.1.0",
+        "p-map": "^5.3.0",
+        "react": "^17.0.2",
+        "typescript": "^4.5.4",
+        "yoga-layout-prebuilt": "1.10.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^27.0.3",
+        "@typescript-eslint/eslint-plugin": "^5.7.0",
+        "@typescript-eslint/parser": "^5.7.0",
+        "eslint": "^7.32.0",
+        "eslint-config-standard": "^16.0.3",
+        "eslint-plugin-import": "^2.25.3",
+        "eslint-plugin-jest": "^25.3.0",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^5.2.0",
+        "eslint-plugin-react": "^7.27.1",
+        "husky": "^7.0.4",
+        "jest": "^27.4.5",
+        "lint-staged": "^12.1.2",
+        "prettier": "^2.5.1",
+        "ts-jest": "^27.1.0"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.ts": "npm run lint",
+        "*.{json,js,ts}": "npm run format"
+    }
 }
