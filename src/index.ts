@@ -4,10 +4,13 @@ import { Task } from "./types/Task";
 import { TaskList } from "./types/TaskList";
 import { TaskState } from "./enums/TaskState";
 import pMap, { Options } from "p-map";
+import { TaskApi } from "./types/TaskAPI";
+import { TaskResults } from "./types/TaskResult";
+import { TaskFunction } from "./types/TaskFunction";
 
-const createTaskInnerApi = (task: Task) => {
+export const createTaskInnerApi = (task: Task) => {
     const api = {
-        task: createTaskFunction(task.children),
+        task: createTask(task.children),
         setTitle(title: string) {
             task.title = title;
         },
@@ -29,20 +32,9 @@ const createTaskInnerApi = (task: Task) => {
     return api;
 };
 
-export type TaskInnerApi = ReturnType<typeof createTaskInnerApi>;
-export type TaskFunction = (taskHelpers: TaskInnerApi) => Promise<unknown>;
-
-type TaskApi<T extends TaskFunction> = {
-    run: () => Promise<ReturnType<T>>;
-    clear: () => void;
-};
-type TaskResults<T extends TaskFunction, Tasks extends TaskApi<T>[]> = {
-    [key in keyof Tasks]: Tasks[key] extends TaskApi<T> ? ReturnType<Tasks[key]["run"]> : Tasks[key];
-};
-
 let app: ReturnType<typeof createApp>;
 
-function registerTask<T extends TaskFunction>(taskList: TaskList, taskTitle: string, taskFunction: T): TaskApi<T> {
+function registerTask(taskList: TaskList, taskTitle: string, taskFunction: TaskFunction): TaskApi {
     if (app == null) {
         taskList.isRoot = true;
         app = createApp(taskList);
@@ -55,7 +47,7 @@ function registerTask<T extends TaskFunction>(taskList: TaskList, taskTitle: str
     });
 
     return {
-        async run(): Promise<ReturnType<T>> {
+        async run(): Promise<ReturnType<TaskFunction>> {
             const api = createTaskInnerApi(task);
 
             task.state = TaskState.loading;
@@ -82,25 +74,22 @@ function registerTask<T extends TaskFunction>(taskList: TaskList, taskTitle: str
     };
 }
 
-function createTaskFunction(taskList: TaskList) {
-    async function task<T extends TaskFunction>(title: string, taskFunction: T) {
+function createTask(taskList: TaskList) {
+    async function task(title: string, taskFunction: TaskFunction) {
         const task = registerTask(taskList, title, taskFunction);
         const result = await task.run();
 
         return Object.assign(task, { result });
     }
 
-    const createTask = <T extends TaskFunction>(title: string, taskFunction: T) => registerTask(taskList, title, taskFunction);
+    const createTask = (title: string, taskFunction: TaskFunction) => registerTask(taskList, title, taskFunction);
 
-    task.group = async <T extends TaskFunction, Tasks extends TaskApi<T>[]>(
-        createTasks: (taskCreator: typeof createTask) => readonly [...Tasks],
-        options?: Options
-    ) => {
+    task.group = async (createTasks: (taskCreator: typeof createTask) => readonly [...TaskApi[]], options?: Options) => {
         const tasksQueue = createTasks(createTask);
         const results = (await pMap(tasksQueue, async (taskApi) => await taskApi.run(), {
             concurrency: 1,
             ...options,
-        })) as unknown as TaskResults<T, Tasks>;
+        })) as unknown as TaskResults;
 
         return {
             results,
@@ -115,7 +104,4 @@ function createTaskFunction(taskList: TaskList) {
     return task;
 }
 
-const rootTaskList = [] as TaskList;
-const task = createTaskFunction(rootTaskList);
-
-export default task;
+export const task = createTask([]);

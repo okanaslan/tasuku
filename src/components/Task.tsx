@@ -72,18 +72,3 @@ export const Task: FC<{
         </Box>
     );
 };
-
-// Task.propTypes = {
-//     children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element]),
-//     label: PropTypes.string.isRequired,
-//     state: PropTypes.oneOf(["pending", "loading", "success", "warning", "error"]),
-//     status: PropTypes.string,
-//     output: PropTypes.string,
-//     spinnerType: PropTypes.oneOf(possibleSpinnerNames),
-//     isExpanded: PropTypes.bool,
-// };
-
-// Task.defaultProps = {
-//     state: TaskState.pending,
-//     spinnerType: "dots",
-// };
