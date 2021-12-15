@@ -1,9 +1,9 @@
-import pMap, { Options } from "p-map";
 import { ArrayUtils } from "./utils/arrayUtils";
 import { createApp } from "./components/CreateApp";
 import { Task } from "./types/Task";
 import { TaskList } from "./types/TaskList";
 import { TaskState } from "./enums/TaskState";
+import pMap, { Options } from "p-map";
 
 const createTaskInnerApi = (task: Task) => {
     const api = {
