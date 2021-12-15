@@ -1,26 +1,23 @@
 import React, { FC, ReactElement, isValidElement, Children } from "react";
 import { Text, Box } from "ink";
-import figures from "figures";
 import Spinner from "ink-spinner";
 import { SpinnerName } from "cli-spinners";
 import { TaskState } from "../enums/TaskState";
 
 const getSymbol = (state?: TaskState) => {
     switch (state) {
-        case TaskState.warning:
-            return <Text color="yellow">{figures.warning}</Text>;
         case TaskState.error:
-            return <Text color="red">{figures.cross}</Text>;
+            return <Text color="red">{"✖"}</Text>;
         case TaskState.success:
-            return <Text color="green">{figures.tick}</Text>;
+            return <Text color="green">{"√"}</Text>;
         case TaskState.pending:
-            return <Text color="gray">{figures.squareSmallFilled}</Text>;
+            return <Text color="gray">{"■"}</Text>;
         default:
             return " ";
     }
 };
 
-const getPointer = (state?: TaskState) => <Text color={state === TaskState.error ? "red" : "yellow"}>{figures.pointer}</Text>;
+const getPointer = (state?: TaskState) => <Text color={state === TaskState.error ? "red" : "yellow"}>{">"}</Text>;
 
 export const Task: FC<{
     label: string;
@@ -61,7 +58,7 @@ export const Task: FC<{
             </Box>
             {output ? (
                 <Box marginLeft={2}>
-                    <Text color="gray">{`${figures.arrowRight} ${output}`}</Text>
+                    <Text color="gray">{`${"→"} ${output}`}</Text>
                 </Box>
             ) : undefined}
             {isExpanded && listChildren.length > 0 && (

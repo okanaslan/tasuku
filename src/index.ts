@@ -1,60 +1,51 @@
-import { ArrayUtils } from "./utils/arrayUtils";
-import { createApp } from "./components/CreateApp";
-import { Task } from "./types/Task";
-import { TaskList } from "./types/TaskList";
+import { App } from "./app";
 import { TaskState } from "./enums/TaskState";
-import pMap, { Options } from "p-map";
+import { ArrayUtils } from "./utils/arrayUtils";
+
+import { Task } from "./types/Task";
 import { TaskApi } from "./types/TaskAPI";
-import { TaskResults } from "./types/TaskResult";
+import { TaskList } from "./types/TaskList";
 import { TaskFunction } from "./types/TaskFunction";
 
 export const createTaskInnerApi = (task: Task) => {
     const api = {
-        task: createTask(task.children),
+        task: init(task.children),
         setTitle(title: string) {
             task.title = title;
         },
         setStatus(status: string) {
             task.status = status;
         },
-        setOutput(output: string | { message: string }) {
-            task.output = typeof output === "string" ? output : "message" in output ? output.message : "";
-        },
-        setWarning(warning: Error | string) {
-            task.state = TaskState.warning;
-            api.setOutput(warning);
+        setOutput(message: string) {
+            task.output = message;
         },
         setError(error: Error | string) {
             task.state = TaskState.error;
-            api.setOutput(error);
+            if (typeof error == "string") {
+                api.setOutput(error);
+            } else {
+                api.setOutput(error.message);
+            }
         },
     };
     return api;
 };
 
-let app: ReturnType<typeof createApp>;
-
 function registerTask(taskList: TaskList, taskTitle: string, taskFunction: TaskFunction): TaskApi {
-    if (app == null) {
-        taskList.isRoot = true;
-        app = createApp(taskList);
-    }
-
-    const task = ArrayUtils.addTo(taskList, {
+    const app = new App();
+    const task: Task = {
         title: taskTitle,
         state: TaskState.pending,
         children: [],
-    });
+    };
+    taskList.push(task);
 
     return {
         async run(): Promise<ReturnType<TaskFunction>> {
             const api = createTaskInnerApi(task);
-
             task.state = TaskState.loading;
-
             try {
                 const taskResult = await taskFunction(api);
-
                 if (task.state == TaskState.loading) {
                     task.state = TaskState.success;
                 }
@@ -74,7 +65,7 @@ function registerTask(taskList: TaskList, taskTitle: string, taskFunction: TaskF
     };
 }
 
-function createTask(taskList: TaskList) {
+function init(taskList: TaskList) {
     async function task(title: string, taskFunction: TaskFunction) {
         const task = registerTask(taskList, title, taskFunction);
         const result = await task.run();
@@ -83,14 +74,13 @@ function createTask(taskList: TaskList) {
     }
 
     const createTask = (title: string, taskFunction: TaskFunction) => registerTask(taskList, title, taskFunction);
-
-    task.group = async (createTasks: (taskCreator: typeof createTask) => readonly [...TaskApi[]], options?: Options) => {
+    task.group = async (createTasks: (taskCreator: typeof createTask) => readonly [...TaskApi[]]) => {
         const tasksQueue = createTasks(createTask);
-        const results = (await pMap(tasksQueue, async (taskApi) => await taskApi.run(), {
-            concurrency: 1,
-            ...options,
-        })) as unknown as TaskResults;
-
+        const results = await Promise.all(
+            tasksQueue.map(async (task) => {
+                await task.run();
+            })
+        );
         return {
             results,
             clear() {
@@ -104,4 +94,30 @@ function createTask(taskList: TaskList) {
     return task;
 }
 
-export const task = createTask([]);
+export const task = init([]);
+
+export const queue = async (title: string, taskFunction: TaskFunction) => {
+    const task = registerTask([], title, taskFunction);
+    const result = await task.run();
+
+    return Object.assign(task, { result });
+};
+
+// export const group = async (tasks: (task: typeof queue) => readonly [...TaskApi[]]) => {
+//     const createTask = async (title: string, taskFunction: TaskFunction) => registerTask([], title, taskFunction);
+
+//     const tasksQueue = tasks(createTask);
+//     const results = await Promise.all(
+//         tasksQueue.map(async (task) => {
+//             await task.run();
+//         })
+//     );
+//     return {
+//         results,
+//         clear() {
+//             for (const task of tasksQueue) {
+//                 task.clear();
+//             }
+//         },
+//     };
+// };
