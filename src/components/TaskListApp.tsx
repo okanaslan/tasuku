@@ -1,28 +1,15 @@
-import React, { FC } from 'react';
-import { TaskList } from 'ink-task-list';
-import { useSnapshot } from 'valtio';
-import type { TaskObject } from '../types';
-import TaskListItem from './TaskListItem';
+import React, { FC } from "react";
 
-const TaskListApp: FC<{
-	taskList: TaskObject[];
-}> = ({
-	taskList,
-}) => {
-	const state = useSnapshot(taskList);
+import { Task } from "../types/Task";
+import { TaskList } from "./TaskList";
+import { TaskListItem } from "./TaskListItem";
 
-	return (
-		<TaskList>
-			{
-				state.map((task, index) => (
-					<TaskListItem
-						key={index}
-						task={task}
-					/>
-				))
-			}
-		</TaskList>
-	);
+export const TaskListApp: FC<{ taskList: Task[] }> = ({ taskList }) => {
+    return (
+        <TaskList>
+            {taskList.map((task, index) => (
+                <TaskListItem key={index} task={task} />
+            ))}
+        </TaskList>
+    );
 };
-
-export default TaskListApp;

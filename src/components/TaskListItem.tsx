@@ -1,34 +1,15 @@
-import React, { FC } from 'react';
-import { Task } from 'ink-task-list';
-import type { TaskObject } from '../types';
+import React, { FC } from "react";
 
-const TaskListItem: FC<{
-	task: TaskObject;
-}> = ({
-	task,
-}) => {
-	const childTasks = (
-		task.children.length > 0
-			? task.children.map((childTask, index) => (
-				<TaskListItem
-					key={index}
-					task={childTask}
-				/>
-			))
-			: undefined
-	);
+import { Task as ReactTask } from "./Task";
+import { Task } from "../types/Task";
 
-	return (
-		<Task
-			state={task.state}
-			label={task.title}
-			status={task.status}
-			output={task.output}
-			isExpanded={childTasks?.length > 0}
-		>
-			{childTasks}
-		</Task>
-	);
+export const TaskListItem: FC<{ task: Task }> = ({ task }) => {
+    const childTasks =
+        task.children.length > 0 ? task.children.map((childTask: Task, index: number) => <TaskListItem key={index} task={childTask} />) : undefined;
+
+    return (
+        <ReactTask state={task.state} label={task.title} status={task.status} output={task.output} isExpanded={(childTasks?.length ?? 0) > 0}>
+            {childTasks}
+        </ReactTask>
+    );
 };
-
-export default TaskListItem;

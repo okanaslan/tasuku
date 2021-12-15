@@ -1,6 +1,5 @@
 {
-	"preset": "es-jest",
-	"transformIgnorePatterns": [
-		"node_modules/.pnpm(?!/(p-map|aggregate-error|indent-string|clean-stack|escape-string-regexp))"
-	]
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transformIgnorePatterns": ["/node_modules/(?!p-map)(.*)"]
 }

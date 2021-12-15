@@ -1,0 +1,10 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "jest"],
+    "extends": ["eslint:recommended", "plugin:node/recommended", "plugin:@typescript-eslint/recommended", "plugin:jest/recommended"],
+    "rules": {
+        "node/no-unsupported-features/es-syntax": "off",
+        "node/no-missing-import": "off"
+    }
+}
